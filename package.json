@@ -1,0 +1,14 @@
+{
+  "private": true,
+  "scripts": {
+    "clean": "rimraf output && rimraf .pulp-cache",
+    "build": "pulp build",
+    "pretest": "pulp build",
+    "test": "pulp test --runtime cat > html/index.js && open html/index.html"
+  },
+  "devDependencies": {
+    "rimraf": "^2.4.1",
+    "react": "^0.14.7",
+    "react-dom": "^0.14.7"    
+  }
+}

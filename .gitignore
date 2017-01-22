@@ -1,0 +1,16 @@
+/.*
+!/.gitignore
+!/.jscsrc
+!/.jshintrc
+!/.travis.yml
+/bower_components/
+/node_modules/
+/output/
+/html/index.js
+/tmp/
+.DS_Store
+.psc-ide-port
+psc.tix
+psc-ide-server.tix
+npm-debug.log
+/docs/

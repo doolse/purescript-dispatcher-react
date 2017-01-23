@@ -5,9 +5,14 @@
     "react",
     "react native"
   ],
+  "license": "MIT",
   "authors": [
     "Jolse Maginnis <doolse@gmail.com>"
   ],
+  "repository": {
+      "type": "git",
+      "url": "git://github.com/doolse/purescript-dispatcher-react.git"
+  },
   "ignore": [
     "**/.*",
     "node_modules",

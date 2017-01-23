@@ -7,8 +7,9 @@ module Dispatcher.React (
 , emptyHandler
 , execHandler
 , createComponent
-, createLifecycleComponent
 , createComponent'
+, createLifecycleComponent
+, createLifecycleComponent'
 , didMount
 , willUnmount
 , ReactState(..)

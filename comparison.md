@@ -46,7 +46,7 @@ initializePrivateState :: CountPublic -> CountPrivate
 
 The only problem for the parent now is that it is also responsible for knowing when the state needs to be initialized.
 
-What I've just described is the basis of how React, [Halogen](https://github.com/slamdata/purescript-halogen), [Thermite](https://github.com/paf31/purescript-thermite) (on top of React) all work conceptually, each have slightly different ways of how to keep track of the state and how to write event handlers. I will start with React and contrast that
+What I've just described is the conceptial basis of how React, [Halogen](https://github.com/slamdata/purescript-halogen) and [Thermite](https://github.com/paf31/purescript-thermite) (on top of React) all work. Each have slightly different ways of how to keep track of the state and how to write event handlers. I will start with React and contrast that
 with Thermite and Halogen and explain why I was motivated to write this library.
 
 ## React

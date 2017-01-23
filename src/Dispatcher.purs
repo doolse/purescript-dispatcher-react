@@ -13,7 +13,7 @@ module Dispatcher (
 ) where
 
 import Prelude
-import Control.Monad.Aff (Aff, Canceler, launchAff)
+import Control.Monad.Aff (Aff, launchAff)
 import Control.Monad.Aff.Unsafe (unsafeCoerceAff)
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Unsafe (unsafeCoerceEff)
@@ -22,9 +22,13 @@ import Data.Function.Eff (EffFn1, EffFn2, EffFn3, mkEffFn1, mkEffFn2, mkEffFn3)
 import Data.Maybe (Maybe, maybe)
 import Type.Equality (class TypeEquals, to)
 
+effEval ::  forall a context eff. (a -> ReaderT context (Eff eff) Unit) -> a -> ReaderT context (Eff eff) Unit
+effEval = id
+
 class Dispatchable eval context action result | eval -> context where
   dispatch :: eval -> context -> action -> result
 
+-- | An instance of `Dispatchable` for optionally dispatching an action using `Maybe`
 instance funcMaybeDispatch :: (Applicative m,  Dispatchable (action -> dispatchable) context dispatchable (m Unit))
   => Dispatchable (action -> dispatchable) context (Maybe action) (m Unit) where
   dispatch f c ma = maybe (pure unit) (\a -> dispatch f c (f a)) ma
@@ -41,11 +45,8 @@ instance effDispacher :: Dispatchable eval context (Eff eff a) (Eff eff2 a) wher
 instance affDispacher :: Dispatchable eval context (Aff eff a) (Aff eff2 a) where
   dispatch _ _ = unsafeCoerceAff
 
-instance aff2EffDispacher :: Dispatchable eval context (Aff eff a) (Eff eff2 (Canceler eff)) where
-  dispatch e c = unsafeCoerceEff <<< launchAff
-
-effEval ::  forall a context eff. (a -> ReaderT context (Eff eff) Unit) -> a -> ReaderT context (Eff eff) Unit
-effEval = id
+instance aff2EffDispacher :: Dispatchable eval context (Aff eff a) (Eff eff2 Unit) where
+  dispatch e c = void <<< unsafeCoerceEff <<< launchAff
 
 class FromContext eval context a m (eff :: # !) | eval context a m -> eff where
   fromContext :: eval -> context -> m eff a

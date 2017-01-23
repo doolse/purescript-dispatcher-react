@@ -1,22 +1,31 @@
 module Test.Main (main) where
 
 import Prelude
+import ReactDOM as RDOM
+import Components.TaskList (taskListClass)
 import Control.Monad.Eff (Eff)
-import Control.Monad.Eff.Console (CONSOLE)
-import CountButton.Dispatcher (useCountButton)
 import DOM (DOM) as DOM
-import DOM.HTML (window)
-import DOM.HTML.Document (body)
-import DOM.HTML.Types (htmlElementToElement)
-import DOM.HTML.Window (document)
-import Data.Foldable (traverse_)
+import DOM.HTML (window) as DOM
+import DOM.HTML.Types (htmlDocumentToParentNode) as DOM
+import DOM.HTML.Window (document) as DOM
+import DOM.Node.ParentNode (querySelector) as DOM
+import Data.Maybe (fromJust)
 import Data.Nullable (toMaybe)
-import React.DOM (div')
-import ReactDOM (render)
+import Examples.Ajax (ajax)
+import Examples.Lifecycle (lifecycleParent)
+import Examples.Toggler (toggler)
+import Partial.Unsafe (unsafePartial)
+import React (createFactory)
 
 -- | The main method creates the task list component, and renders it to the document body.
-main :: Eff (console::CONSOLE,dom :: DOM.DOM) Unit
-main = do
-  document <- window >>= document
-  container <- toMaybe <$> body document
-  traverse_ (render (div' $ useCountButton 10 5) <<< htmlElementToElement) container
+main :: Eff (dom :: DOM.DOM) Unit
+main = void do
+  let component = taskListClass
+  document <- DOM.window >>= DOM.document
+  let runExample elem contName = do
+        container <- unsafePartial (fromJust <<< toMaybe <$> DOM.querySelector contName (DOM.htmlDocumentToParentNode document))
+        RDOM.render elem container
+  runExample (ajax {title:"Raiders of the Lost Ark"}) "#container"
+  runExample (createFactory taskListClass unit) "#todocontainer"
+  runExample toggler "#togglercontainer"
+  runExample lifecycleParent "#lifecyclecontainer"

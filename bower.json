@@ -1,5 +1,5 @@
 {
-  "name": "purescript-simpleaction-react",
+  "name": "purescript-dispatcher-react",
   "description": "A simple action dispatcher for purescript-react",
   "keywords": [
     "react",
@@ -17,8 +17,11 @@
     "purescript-aff": "^2.0.2",
     "purescript-eff-functions": "^2.0.0",
     "purescript-react": "^2.0.0",
-    "purescript-react-dom": "^2.0.0",
     "purescript-dom": "^3.1.0",
+    "purescript-react-dom": "^2.0.0",
     "purescript-type-equality": "^1.0.0"
+  },
+  "devDependencies": {
+    "purescript-affjax": "*"
   }
 }

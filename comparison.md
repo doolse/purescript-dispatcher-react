@@ -46,8 +46,7 @@ initializePrivateState :: CountPublic -> CountPrivate
 
 The only problem for the parent now is that it is also responsible for knowing when the state needs to be initialized.
 
-What I've just described is the basis of how React, Halogen, Pux, Thermite (on top of React) all work conceptually, each have
-slightly different ways of how to keep track of the state and how to write event handlers. I will start with React and contrast that
+What I've just described is the basis of how React, [Halogen](https://github.com/slamdata/purescript-halogen), [Thermite](https://github.com/paf31/purescript-thermite) (on top of React) all work conceptually, each have slightly different ways of how to keep track of the state and how to write event handlers. I will start with React and contrast that
 with Thermite and Halogen and explain why I was motivated to write this library.
 
 ## React
@@ -345,4 +344,17 @@ newtype DispatchEffFn2 action = DispatchEffFn2 (forall event ev2 eff. (event -> 
 newtype DispatchEffFn3 action = DispatchEffFn3 (forall event ev2 ev3 eff. (event -> ev2 -> ev3 -> action) -> EffFn3 eff event ev2 ev3 Unit)
 ```
 
-I left it at 3 as other arrities aren't that common and you can always make a higher arrity `EffFnX` by using `DispatchEff` if needs be.
+You can make a higher arrity `EffFnX` by using `DispatchEff` if needs be.
+
+```purescript
+mkEffFn4 \ev1 ev2 ev3 -> d \ev4 -> action
+```
+
+The first argument of the `render` function is always the state, however the rest of the arguments can be anything that has an instance
+of the `FromContext` type class.
+
+```purescript
+render s (DispatchEff d) (DispatchEffFn d1) (ReactProps p) (ReactChildren c) = ...
+```
+
+So there are newtype's for getting the React props and Children, and you can also combine as many Dispatcher's as your child components need.

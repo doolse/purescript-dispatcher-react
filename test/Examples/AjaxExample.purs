@@ -4,7 +4,8 @@ import Prelude
 import Control.Monad.Except (runExcept)
 import Control.Monad.Trans.Class (lift)
 import Data.Either (either)
-import Data.Foreign.Class (class IsForeign, readJSON, readProp)
+import Data.Foreign.Generic (genericDecodeJSON, defaultOptions)
+import Data.Generic.Rep (class Generic)
 import Data.Maybe (Maybe(..), maybe)
 import Dispatcher.React (createLifecycleComponent, didMount, getProps, modifyState)
 import Global (encodeURIComponent)
@@ -16,11 +17,7 @@ import React.DOM.Props (src)
 data Action = FetchMovie
 
 newtype Movie = Movie { title :: String, poster :: String}
-instance movieIsForeign :: IsForeign Movie where
-  read value = do
-    title <- readProp "Title" value
-    poster <- readProp "Poster" value
-    pure $ Movie {title,poster}
+derive instance genericMovie :: Generic Movie _
 
 type State = {movie::Maybe Movie}
 
@@ -35,5 +32,5 @@ ajax = createFactory $ createLifecycleComponent (didMount FetchMovie) {movie:Not
     eval FetchMovie = do
       {title} <- getProps
       s <- lift $ get $ "http://www.omdbapi.com/?t=" <> encodeURIComponent title <> "&y=&plot=short&r=json"
-      let movie = either (const $ Nothing) Just $ runExcept $ readJSON s.response
+      let movie = either (const $ Nothing) Just $ runExcept $ genericDecodeJSON defaultOptions s.response
       modifyState _ {movie=movie}

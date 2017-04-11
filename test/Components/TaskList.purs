@@ -7,12 +7,12 @@ import Data.Array (fromFoldable)
 import Data.Filter (Filter(..), showFilter)
 import Data.List (List(..), deleteAt, filter, length, mapWithIndex, modifyAt)
 import Data.Maybe (Maybe(..), fromMaybe)
-import Data.Tuple (Tuple(Tuple), fst)
+import Data.Tuple (Tuple(Tuple), snd)
+import Dispatcher (DispatchEff(..), effEval)
+import Dispatcher.React (modifyState, createComponent)
 import React (ReactClass)
 import React (ReactElement) as R
 import React.DOM (text, p', td', input, tr', tbody', th, thead', table, div, h1', button) as R
-import Dispatcher.React (modifyState, createComponent)
-import Dispatcher (DispatchEff(..), effEval)
 import Unsafe.Coerce (unsafeCoerce)
 
 
@@ -78,7 +78,7 @@ taskListClass = createComponent initialTaskListState taskListRender (effEval per
             handleKeyPress 13 text = Just $ NewTask text
             handleKeyPress 27 _    = Just $ SetEditText ""
             handleKeyPress _  _    = Nothing
-            renderTask (Tuple t i) = task _ {
+            renderTask (Tuple i t) = task _ {
                 onRemove = d \_ -> RemoveTask i
               , onChangeCompleted = d \b -> TaskChangeCompletion i b } t
         in R.table [ RP.className "table table-striped" ]
@@ -97,7 +97,7 @@ taskListClass = createComponent initialTaskListState taskListRender (effEval per
                                                   ]
                                           , R.td' []
                                           ]
-                                  ] <> (fromFoldable $ renderTask <$> (filter (fst >>> matches s.filter) $ mapWithIndex Tuple s.tasks))
+                                  ] <> (fromFoldable $ renderTask <$> (filter (snd >>> matches s.filter) $ mapWithIndex Tuple s.tasks))
                      ]
 
 

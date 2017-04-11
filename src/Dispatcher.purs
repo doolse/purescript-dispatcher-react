@@ -15,10 +15,10 @@ module Dispatcher (
 import Prelude
 import Control.Monad.Aff (Aff, launchAff)
 import Control.Monad.Aff.Unsafe (unsafeCoerceAff)
-import Control.Monad.Eff (Eff)
+import Control.Monad.Eff (Eff, kind Effect)
 import Control.Monad.Eff.Unsafe (unsafeCoerceEff)
 import Control.Monad.Reader (ReaderT, runReaderT)
-import Data.Function.Eff (EffFn1, EffFn2, EffFn3, mkEffFn1, mkEffFn2, mkEffFn3)
+import Control.Monad.Eff.Uncurried (EffFn1, EffFn2, EffFn3, mkEffFn1, mkEffFn2, mkEffFn3)
 import Data.Maybe (Maybe, maybe)
 import Type.Equality (class TypeEquals, to)
 
@@ -48,7 +48,7 @@ instance affDispacher :: Dispatchable eval context (Aff eff a) (Aff eff2 a) wher
 instance aff2EffDispacher :: Dispatchable eval context (Aff eff a) (Eff eff2 Unit) where
   dispatch e c = void <<< unsafeCoerceEff <<< launchAff
 
-class FromContext eval context a m (eff :: # !) | eval context a m -> eff where
+class FromContext eval context a m (eff :: # Effect) | eval context a m -> eff where
   fromContext :: eval -> context -> m eff a
 
 newtype DispatchEff action = DispatchEff (forall event eff. (event -> action) -> event -> Eff eff Unit)

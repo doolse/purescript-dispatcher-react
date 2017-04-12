@@ -10,8 +10,8 @@
     "Jolse Maginnis <doolse@gmail.com>"
   ],
   "repository": {
-      "type": "git",
-      "url": "git://github.com/doolse/purescript-dispatcher-react.git"
+    "type": "git",
+    "url": "git://github.com/doolse/purescript-dispatcher-react.git"
   },
   "ignore": [
     "**/.*",
@@ -19,14 +19,15 @@
     "bower_components"
   ],
   "dependencies": {
-    "purescript-aff": "^2.0.2",
-    "purescript-eff-functions": "^2.0.0",
-    "purescript-react": "^2.0.0",
-    "purescript-dom": "^3.1.0",
-    "purescript-react-dom": "^2.0.0",
-    "purescript-type-equality": "^1.0.0"
+    "purescript-aff": "^3.0.0",
+    "purescript-eff": "^3.0.0",
+    "purescript-react": "^3.0.0",
+    "purescript-dom": "^4.0.0",
+    "purescript-react-dom": "^3.0.0",
+    "purescript-type-equality": "^2.0.0"
   },
   "devDependencies": {
-    "purescript-affjax": "*"
+    "purescript-affjax": "^4.0.0",
+    "purescript-foreign-generic": "^4.0.0"
   }
 }

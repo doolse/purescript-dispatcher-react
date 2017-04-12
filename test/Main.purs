@@ -8,9 +8,8 @@ import DOM (DOM) as DOM
 import DOM.HTML (window) as DOM
 import DOM.HTML.Types (htmlDocumentToParentNode) as DOM
 import DOM.HTML.Window (document) as DOM
-import DOM.Node.ParentNode (querySelector) as DOM
+import DOM.Node.ParentNode (QuerySelector(..), querySelector) as DOM
 import Data.Maybe (fromJust)
-import Data.Nullable (toMaybe)
 import Examples.Ajax (ajax)
 import Examples.Lifecycle (lifecycleParent)
 import Examples.Toggler (toggler)
@@ -23,9 +22,9 @@ main = void do
   let component = taskListClass
   document <- DOM.window >>= DOM.document
   let runExample elem contName = do
-        container <- unsafePartial (fromJust <<< toMaybe <$> DOM.querySelector contName (DOM.htmlDocumentToParentNode document))
+        container <- unsafePartial (fromJust <$> DOM.querySelector (DOM.QuerySelector contName) (DOM.htmlDocumentToParentNode document))
         RDOM.render elem container
-  runExample (ajax {title:"Raiders of the Lost Ark"}) "#container"
-  runExample (createFactory taskListClass unit) "#todocontainer"
-  runExample toggler "#togglercontainer"
+  _ <- runExample (ajax {title:"Raiders of the Lost Ark"}) "#container"
+  _ <- runExample (createFactory taskListClass unit) "#todocontainer"
+  _ <- runExample toggler "#togglercontainer"
   runExample lifecycleParent "#lifecyclecontainer"

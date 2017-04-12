@@ -102,7 +102,7 @@ class ReactRender eval renderer props state eff | renderer -> eff where
   createRenderer :: eval -> renderer -> Render props state eff
 
 -- | Create a ReactClass with the given state, renderer and action evaluator
-createComponent :: forall props state state2 eval renderer eff. (TypeEquals state2 state, ReactSpecCreator eval (ReactState state) renderer props state eff)
+createComponent :: forall props state state2 eval renderer eff. TypeEquals state2 state => ReactSpecCreator eval (ReactState state) renderer props state eff
   => state2 -> (state -> renderer) -> eval -> ReactClass props
 createComponent state = createComponent' (ReactState $ to state :: state)
 
@@ -113,7 +113,7 @@ createComponent' :: forall props state eval initialstate renderer eff. ReactSpec
 createComponent' = createLifecycleComponent' (pure unit)
 
 -- | Create a ReactClass with the given lifecycle, state, renderer and action evaluator
-createLifecycleComponent :: forall props state state2 eval renderer eff. (TypeEquals state2 state, ReactSpecCreator eval (ReactState state) renderer props state eff)
+createLifecycleComponent :: forall props state state2 eval renderer eff. TypeEquals state2 state => ReactSpecCreator eval (ReactState state) renderer props state eff
   => ReactLifecycle props state eval eff -> state2 -> (state -> renderer) -> eval -> ReactClass props
 createLifecycleComponent specf state = createLifecycleComponent' specf (ReactState $ to state :: state)
 

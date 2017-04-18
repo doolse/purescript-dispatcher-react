@@ -44,11 +44,11 @@ toggler = createFactory (createComponent { on: false } render (effEval eval)) un
 data Action = FetchMovie
 
 newtype Movie = Movie { title :: String, poster :: String}
-instance movieIsForeign :: IsForeign Movie where
-  read value = do
-    title <- readProp "Title" value
-    poster <- readProp "Poster" value
-    pure $ Movie {title,poster}
+instance decodeMovie :: Decode Movie where
+  decode f = do
+    title <- readProp "Title" f >>= decode
+    poster <- readProp "Poster" f >>= decode
+    pure $ Movie { title, poster }
 
 type State = {movie::Maybe Movie}
 
@@ -57,13 +57,13 @@ ajax = createFactory $ createLifecycleComponent (didMount FetchMovie) {movie:Not
   where
     render {movie} = div' $ maybe nomovie showMovie movie
       where
-      showMovie (Movie {title,poster}) = [ h1' [ text title ], img [src poster] [] ]
+      showMovie (Movie {title, poster}) = [ h1' [ text title ], img [src poster] [] ]
       nomovie = [ h1' [ text "Waiting for movie response" ] ]
 
     eval FetchMovie = do
       {title} <- getProps
       s <- lift $ get $ "http://www.omdbapi.com/?t=" <> encodeURIComponent title <> "&y=&plot=short&r=json"
-      let movie = either (const $ Nothing) Just $ runExcept $ readJSON s.response
+      let movie = either (const $ Nothing) Just $ runExcept $ decodeJSON s.response
       modifyState _ {movie=movie}
 ```
 

@@ -1,14 +1,12 @@
 module Examples.Ajax where
 
 import Prelude
-import Control.Apply (lift2)
 import Control.Monad.Except (runExcept)
 import Control.Monad.Trans.Class (lift)
 import Data.Either (either)
-import Data.Foreign (readString)
-import Data.Foreign.Class (class Decode)
-import Data.Foreign.Index (readProp)
+import Data.Foreign.Class (class Decode, decode)
 import Data.Foreign.Generic (decodeJSON)
+import Data.Foreign.Index (readProp)
 import Data.Maybe (Maybe(..), maybe)
 import Dispatcher.React (createLifecycleComponent, didMount, getProps, modifyState)
 import Global (encodeURIComponent)
@@ -22,9 +20,9 @@ data Action = FetchMovie
 newtype Movie = Movie { title :: String, poster :: String}
 instance decodeMovie :: Decode Movie where
   decode f = do
-    titleT <- readString <$> readProp "Title" f
-    posterT <- readString <$> readProp "Poster" f
-    lift2 ( \title poster -> Movie { title, poster } ) titleT posterT
+    title <- readProp "Title" f >>= decode
+    poster <- readProp "Poster" f >>= decode
+    pure $ Movie { title, poster }
 
 type State = {movie::Maybe Movie}
 

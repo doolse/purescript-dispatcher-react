@@ -16,9 +16,10 @@ import Prelude
 import Control.Monad.Aff (Aff, launchAff)
 import Control.Monad.Aff.Unsafe (unsafeCoerceAff)
 import Control.Monad.Eff (Eff, kind Effect)
+import Control.Monad.Eff.Uncurried (EffFn1, EffFn2, EffFn3, mkEffFn1, mkEffFn2, mkEffFn3)
 import Control.Monad.Eff.Unsafe (unsafeCoerceEff)
 import Control.Monad.Reader (ReaderT, runReaderT)
-import Control.Monad.Eff.Uncurried (EffFn1, EffFn2, EffFn3, mkEffFn1, mkEffFn2, mkEffFn3)
+import Data.Functor.Contravariant (class Contravariant)
 import Data.Maybe (Maybe, maybe)
 import Type.Equality (class TypeEquals, to)
 
@@ -85,3 +86,18 @@ newtype Context a = Context a
 
 instance contextFromContext :: (TypeEquals context context2, Applicative (m eff)) => FromContext eval context (Context context2) m eff where
   fromContext _ c = pure (Context $ to c)
+
+instance dispatchEffFunctor :: Contravariant DispatchEff where
+  cmap f (DispatchEff d) = DispatchEff (\f2 -> d (f <<< f2))
+
+instance dispatchAffFunctor :: Contravariant DispatchAff where
+  cmap f (DispatchAff d) = DispatchAff (\f2 -> d (f <<< f2))
+
+instance dispatchEffFnFunctor :: Contravariant DispatchEffFn where
+  cmap f (DispatchEffFn d) = DispatchEffFn (\f2 -> d (f <<< f2))
+
+instance dispatchEffFn2Functor :: Contravariant DispatchEffFn2 where
+  cmap f (DispatchEffFn2 d) = DispatchEffFn2 (\f2 -> d (\e -> f <<< f2 e))
+
+instance dispatchEffFn3Functor :: Contravariant DispatchEffFn3 where
+  cmap f (DispatchEffFn3 d) = DispatchEffFn3 (\f2 -> d (\e e2 -> f <<< f2 e e2))

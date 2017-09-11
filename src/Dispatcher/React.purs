@@ -24,7 +24,6 @@ module Dispatcher.React (
 , createSpec
 , createInitialState
 , createRenderer
-, renderWithSelector
 ) where
 
 import Prelude
@@ -34,11 +33,6 @@ import Control.Monad.Eff.Unsafe (unsafeCoerceEff)
 import Control.Monad.RWS (RWS, ask, execRWS, modify)
 import Control.Monad.Reader (ReaderT(ReaderT))
 import Control.Monad.Trans.Class (lift)
-import DOM (DOM)
-import DOM.HTML (window)
-import DOM.HTML.Types (htmlDocumentToParentNode)
-import DOM.HTML.Window (document)
-import DOM.Node.ParentNode (QuerySelector(..), querySelector)
 import Data.Function.Uncurried (Fn4, runFn4)
 import Data.Maybe (Maybe(..), fromJust)
 import Data.Tuple (fst)
@@ -46,7 +40,6 @@ import Dispatcher (class Dispatchable, class FromContext, dispatch, fromContext)
 import Partial.Unsafe (unsafePartial)
 import React (GetInitialState, ReactClass, ReactComponent, ReactElement, ReactRefs, ReactSpec, ReactThis, Read, ReadOnly, ReadWrite, Refs, Render, createClass, getChildren, readState, spec', transformState)
 import React (ReactState, ReactProps, getProps, getRefs) as R
-import ReactDOM (render)
 import Type.Equality (class TypeEquals, to)
 
 -- | The type of all React action handling functions
@@ -54,14 +47,6 @@ type ReactReaderT props state m a = ReaderT (ReactThis props state) m a
 
 -- | The type of React lifecycle methods - Reader Writer State (RWS) with the eval being the Reader type and the ReactSpec being the State type.
 type ReactLifecycle props state eval eff = RWS eval Unit (ReactSpec props state eff) Unit
-
--- | Utility method for rendering a ReactElement to the DOM using a CSS selector
--- | Will blow up if the element doesn't exist
-renderWithSelector :: forall e. String -> ReactElement -> Eff ( dom :: DOM | e ) (Maybe ReactComponent)
-renderWithSelector selector component = do
-  document <- window >>= document
-  container <- unsafePartial (fromJust <$> querySelector (QuerySelector selector) (htmlDocumentToParentNode document))
-  render component container
 
 reactReaderT :: forall props state m a. (ReactThis props state -> m a) -> ReactReaderT props state m a
 reactReaderT = ReaderT

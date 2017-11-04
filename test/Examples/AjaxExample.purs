@@ -1,12 +1,10 @@
 module Examples.Ajax where
 
 import Prelude
-import Control.Monad.Except (runExcept)
+
 import Control.Monad.Trans.Class (lift)
+import Data.Argonaut (class DecodeJson, decodeJson, (.?))
 import Data.Either (either)
-import Data.Foreign.Class (class Decode, decode)
-import Data.Foreign.Generic (decodeJSON)
-import Data.Foreign.Index (readProp)
 import Data.Maybe (Maybe(..), maybe)
 import Dispatcher.React (createLifecycleComponent, didMount, getProps, modifyState)
 import Global (encodeURIComponent)
@@ -18,10 +16,11 @@ import React.DOM.Props (src)
 data Action = FetchMovie
 
 newtype Movie = Movie { title :: String, poster :: String}
-instance decodeMovie :: Decode Movie where
-  decode f = do
-    title <- readProp "Title" f >>= decode
-    poster <- readProp "Poster" f >>= decode
+instance decodeMovie :: DecodeJson Movie where
+  decodeJson v = do
+    o <- decodeJson v
+    title <- o .? "Title"
+    poster <- o .? "Poster"
     pure $ Movie { title, poster }
 
 type State = {movie::Maybe Movie}
@@ -36,6 +35,6 @@ ajax = createFactory $ createLifecycleComponent (didMount FetchMovie) {movie:Not
 
     eval FetchMovie = do
       {title} <- getProps
-      s <- lift $ get $ "http://www.omdbapi.com/?t=" <> encodeURIComponent title <> "&y=&plot=short&r=json"
-      let movie = either (const $ Nothing) Just $ runExcept $ decodeJSON s.response
+      s <- lift $ get $ "http://www.omdbapi.com/?t=" <> encodeURIComponent title <> "&y=&plot=short&r=json&apikey=16824787"
+      let movie = either (const $ Nothing) Just $ decodeJson s.response
       modifyState _ {movie=movie}

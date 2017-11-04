@@ -4,12 +4,13 @@
     "clean": "rimraf output && rimraf .pulp-cache",
     "build": "pulp build",
     "pretest": "pulp build",
-    "test": "pulp test --runtime cat > html/index.js"
+    "test": "pulp browserify -m Test.Main --to html/index.js"
   },
   "devDependencies": {
     "purescript-psa": "^0.5.1",
-    "react": "^0.14.7",
-    "react-dom": "^0.14.7",
+    "react": "^16.0.0",
+    "react-dom": "^16.0.0",
+    "create-react-class": "^15.6.0",
     "rimraf": "^2.4.1"
   }
 }

@@ -34,11 +34,10 @@ import Control.Monad.RWS (RWS, ask, execRWS, modify)
 import Control.Monad.Reader (ReaderT(ReaderT))
 import Control.Monad.Trans.Class (lift)
 import Data.Function.Uncurried (Fn4, runFn4)
-import Data.Maybe (Maybe(..), fromJust)
+import Data.Maybe (Maybe(..))
 import Data.Tuple (fst)
 import Dispatcher (class Dispatchable, class FromContext, dispatch, fromContext)
-import Partial.Unsafe (unsafePartial)
-import React (GetInitialState, ReactClass, ReactComponent, ReactElement, ReactRefs, ReactSpec, ReactThis, Read, ReadOnly, ReadWrite, Refs, Render, createClass, getChildren, readState, spec', transformState)
+import React (GetInitialState, ReactClass, ReactElement, ReactRefs, ReactSpec, ReactThis, Read, ReadOnly, ReadWrite, Refs, Render, createClass, getChildren, readState, spec', transformState)
 import React (ReactState, ReactProps, getProps, getRefs) as R
 import Type.Equality (class TypeEquals, to)
 
@@ -46,7 +45,7 @@ import Type.Equality (class TypeEquals, to)
 type ReactReaderT props state m a = ReaderT (ReactThis props state) m a
 
 -- | The type of React lifecycle methods - Reader Writer State (RWS) with the eval being the Reader type and the ReactSpec being the State type.
-type ReactLifecycle props state eval eff = RWS eval Unit (ReactSpec props state eff) Unit
+type ReactLifecycle props state eval eff = RWS eval Unit (ReactSpec props state ReactElement eff) Unit
 
 reactReaderT :: forall props state m a. (ReactThis props state -> m a) -> ReactReaderT props state m a
 reactReaderT = ReaderT
@@ -94,13 +93,13 @@ execHandler e = lift $ liftEff $ unsafeCoerceEff e
 
 class ReactSpecCreator eval initialstate render props state eff | eval initialstate render -> props state eff where
   -- | Given an action evaluator, an initial state, and a render function, return a `ReactSpec`.
-  createSpec :: eval -> initialstate -> (state -> render) -> ReactSpec props state eff
+  createSpec :: eval -> initialstate -> (state -> render) -> ReactSpec props state ReactElement eff
 
 class ReactInitialState eval initialstate props state eff | initialstate -> state where
   createInitialState :: eval -> initialstate -> GetInitialState props state eff
 
 class ReactRender eval renderer props state eff | renderer -> eff where
-  createRenderer :: eval -> renderer -> Render props state eff
+  createRenderer :: eval -> renderer -> Render props state ReactElement eff
 
 -- | Create a ReactClass with the given state, renderer and action evaluator
 createComponent :: forall props state state2 eval renderer eff. TypeEquals state2 state => ReactSpecCreator eval (ReactState state) renderer props state eff
@@ -121,7 +120,7 @@ createLifecycleComponent specf state = createLifecycleComponent' specf (ReactSta
 -- | Create a ReactClass with the given lifecycle, initialstate function, renderer and action evaluator
 -- | The initialstate function must return it's state value wrapped in the `ReactState` newtype
 createLifecycleComponent' :: forall props state initialstate eval renderer eff. ReactSpecCreator eval initialstate renderer props state eff
-  => (RWS eval Unit (ReactSpec props state eff) Unit) ->
+  => (RWS eval Unit (ReactSpec props state ReactElement eff) Unit) ->
    initialstate -> (state -> renderer) -> eval -> ReactClass props
 createLifecycleComponent' f state renderer eval = createClass $ fst $ execRWS f eval (createSpec eval state renderer)
 

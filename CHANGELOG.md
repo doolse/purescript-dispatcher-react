@@ -1,3 +1,7 @@
+# 3.1.0
+
+* Bump purescript-react dependency, use argonaut in sample
+
 # 3.0.0
 
 * Removed `renderWithSelector` utility method and upgrade library versions

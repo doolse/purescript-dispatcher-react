@@ -1,29 +1,36 @@
 module Examples.Lifecycle where
 
 import Prelude
-import Control.Monad.Eff (Eff)
-import Control.Monad.Eff.Console (log)
-import Dispatcher (DispatchEff(..), effEval)
-import Dispatcher.React (ReactProps(..), createComponent, createLifecycleComponent, didMount, modifyState, willUnmount)
-import React (ReactElement, createFactory)
+
+import Dispatcher (action)
+import Dispatcher.React (modifyState, propsRenderer, renderer)
+import Effect (Effect)
+import Effect.Console (log)
+import React (ReactClass, ReactElement, component, createLeafElement, unsafeCreateLeafElement)
 import React.DOM (button, div', h1', text)
 import React.DOM.Props (onClick)
 
 data Action = Init | Destroy
 
-lifecycleComponent :: forall eff. {onClick :: Unit -> Eff eff Unit} -> ReactElement
-lifecycleComponent = createFactory (createLifecycleComponent (didMount Init *> willUnmount Destroy) {} render eval) where
-  render s (ReactProps p) (DispatchEff d) = div' [
-        h1' [ text "I am alive" ]
-      , button [onClick $ d \_ -> p.onClick unit] [ text "Click to kill me"]
-    ]
-  eval Init = log "I am alive"
-  eval Destroy = log "I am dead"
+lifecycleComponent :: ReactClass {onClick :: Unit -> Effect Unit}
+lifecycleComponent = component "Lifecycle" spec
+  where 
+  spec this = pure $ {render: propsRenderer render this}
+    where 
+    eval Init = log "I am alive"
+    eval Destroy = log "I am dead"
 
+    render p = div' [
+          h1' [ text "I am alive" ]
+        , button [onClick $ \_ -> p.onClick unit] [ text "Click to kill me"]
+    ]
 
 lifecycleParent :: ReactElement
-lifecycleParent = createFactory (createComponent {show:true} render unit) unit where
-  render {show} (DispatchEff d) =
-    if show
-    then lifecycleComponent {onClick: d $ effEval \_ ->  modifyState _ {show=false}}
-    else div' [ text "You killed it. Check the console" ]
+lifecycleParent = unsafeCreateLeafElement (component "LifecycleParent" spec) {} where
+  spec this = pure $ {state: {show:true}, render: renderer render this}
+    where 
+    d = action this
+    render {state: {show}} =
+      if show
+      then createLeafElement lifecycleComponent {onClick: \_ -> d $ modifyState _ {show=false}}
+      else div' [ text "You killed it. Check the console" ]

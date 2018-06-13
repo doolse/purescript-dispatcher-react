@@ -19,18 +19,16 @@
     "bower_components"
   ],
   "dependencies": {
-    "purescript-aff": "^4.0.0",
-    "purescript-eff": "^3.1.0",
-    "purescript-react": "^5.0.0",
-    "purescript-type-equality": "^2.1.0",
-    "purescript-contravariant": "^3.1.0"
+    "purescript-aff": "^5.0.0",
+    "purescript-react": "^6.0.0",
+    "purescript-refs": "^4.1.0"
   },
   "devDependencies": {
-    "purescript-affjax": "^5.0.0",
-    "purescript-argonaut": "^3.1.0",
-    "purescript-react-dom": "^4.1.0"
-  },
-  "resolutions": {
-    "purescript-react": "^5.0.0"
+    "purescript-affjax": "^6.0.0",
+    "purescript-argonaut": "^4.0.0",
+    "purescript-react-dom": "^6.0.0",
+    "purescript-console": "^4.1.0",
+    "purescript-web-html": "^1.0.0",
+    "purescript-globals": "^4.0.0"
   }
 }

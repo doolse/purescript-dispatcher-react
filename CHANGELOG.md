@@ -1,3 +1,7 @@
+# 4.0.0
+
+* A slimming down of the API now that React 6.0.0 is out, PS 0.12 support
+
 # 3.1.0
 
 * Bump purescript-react dependency, use argonaut in sample

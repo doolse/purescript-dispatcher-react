@@ -1,30 +1,27 @@
 module Test.Main (main) where
 
 import Prelude
-import ReactDOM as RDOM
-import Components.TaskList (taskListClass)
-import Control.Monad.Eff (Eff)
-import DOM (DOM) as DOM
-import DOM.HTML (window) as DOM
-import DOM.HTML.Types (htmlDocumentToParentNode) as DOM
-import DOM.HTML.Window (document) as DOM
-import DOM.Node.ParentNode (QuerySelector(..), querySelector) as DOM
+
+import Components.TaskList (taskList)
 import Data.Maybe (fromJust)
+import Effect (Effect)
 import Examples.Ajax (ajax)
 import Examples.Lifecycle (lifecycleParent)
 import Examples.Toggler (toggler)
 import Partial.Unsafe (unsafePartial)
-import React (createFactory)
-
+import ReactDOM as RDOM
+import Web.DOM.ParentNode (QuerySelector(..), querySelector)
+import Web.HTML (window)
+import Web.HTML.HTMLDocument (toParentNode)
+import Web.HTML.Window (document)
 -- | The main method creates the task list component, and renders it to the document body.
-main :: Eff (dom :: DOM.DOM) Unit
+main :: Effect Unit
 main = void do
-  let component = taskListClass
-  document <- DOM.window >>= DOM.document
+  document <- window >>= document
   let runExample elem contName = do
-        container <- unsafePartial (fromJust <$> DOM.querySelector (DOM.QuerySelector contName) (DOM.htmlDocumentToParentNode document))
+        container <- unsafePartial (fromJust <$> querySelector (QuerySelector contName) (toParentNode document))
         RDOM.render elem container
   _ <- runExample (ajax {title:"Raiders of the Lost Ark"}) "#container"
-  _ <- runExample (createFactory taskListClass unit) "#todocontainer"
-  _ <- runExample toggler "#togglercontainer"
-  runExample lifecycleParent "#lifecyclecontainer"
+  _ <- runExample taskList "#todocontainer"
+  _ <- runExample (toggler) "#togglercontainer"
+  runExample (lifecycleParent) "#lifecyclecontainer"
